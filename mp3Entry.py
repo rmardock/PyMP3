@@ -27,7 +27,7 @@ palette.setColor(QtGui.QPalette.HighlightedText, QtCore.Qt.black)
 app.setPalette(palette)
 ui = Ui_MainWindow()
 ui.setupUi(MainWindow)
-#ui.initUI(MainWindow)
+ui.initUI(MainWindow)
 MainWindow.show()
 sys.exit(app.exec_())
 
