@@ -1,6 +1,8 @@
 from PyQt5 import QtCore, QtGui, QtWidgets 
 from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import QDir
+import pygame
+import getpass
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -46,6 +48,9 @@ class Ui_MainWindow(object):
         self.horizontalSlider.setGeometry(QtCore.QRect(20, 530, 160, 20))
         self.horizontalSlider.setOrientation(QtCore.Qt.Horizontal)
         self.horizontalSlider.setObjectName("horizontalSlider")
+        self.horizontalSlider.setMinimum(0)
+        self.horizontalSlider.setMaximum(100)
+        self.horizontalSlider.setValue(50)
 
         self.label_3 = QtWidgets.QLabel(self.centralwidget)
         self.label_3.setGeometry(QtCore.QRect(20, 510, 161, 18))
@@ -63,6 +68,10 @@ class Ui_MainWindow(object):
         self.pushButton_5.setGeometry(QtCore.QRect(667, 100, 111, 34))
         self.pushButton_5.setObjectName("pushButton_5")
 
+        self.listWidget = QtWidgets.QListWidget(self.centralwidget)
+        self.listWidget.setGeometry(QtCore.QRect(20, 50, 151, 451))
+        self.listWidget.setObjectName("listWidget")
+
         MainWindow.setCentralWidget(self.centralwidget)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -74,24 +83,40 @@ class Ui_MainWindow(object):
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "Music Player"))
-        self.pushButton.setText(_translate("MainWindow", "Play"))
-        self.pushButton_2.setText(_translate("MainWindow", "Previous"))
-        self.pushButton_3.setText(_translate("MainWindow", "Stop"))
-        self.pushButton_4.setText(_translate("MainWindow", "Next"))
+        self.pushButton.setText(_translate("MainWindow", "▶️"))
+        self.pushButton_2.setText(_translate("MainWindow", "⏮️"))
+        self.pushButton_3.setText(_translate("MainWindow", "⏹️"))
+        self.pushButton_4.setText(_translate("MainWindow", "⏭️"))
         self.pushButton_6.setText(_translate("MainWindow", "Select a song"))
         self.label_2.setText(_translate("MainWindow", "SongName"))
         self.label_3.setText(_translate("MainWindow", "Volume"))
         self.pushButton_5.setText(_translate("MainWindow", "Select Playlist"))
-        self.pushButton_7.setText(_translate("MainWindow", "Pause"))
+        self.pushButton_7.setText(_translate("MainWindow", "⏸️"))
 
     def initUI(self, MainWindow):
+        #File browsing button connections
         self.pushButton_6.clicked.connect(self.browse_songs)
         self.pushButton_5.clicked.connect(self.browse_playlist)#add ability to create playlists and add to them
 
         #Media control button connections
-        #self.pushButton.clicked.connect(self.play)
-        #self.pushButton_7.clicked.connect(self.pause)
-        #self.pushButton_3.clicked.connect(self.stop)
+        self.pushButton.clicked.connect(self.play)
+        self.pushButton_7.clicked.connect(self.pause)
+        self.pushButton_3.clicked.connect(self.stop)
+        self.listWidget.itemSelectionChanged.connect(self.selection_change)
+        self.horizontalSlider.valueChanged.connect(self.adjust_volume)
+
+        #Initialize user name for file path
+        global user
+        user = getpass.getuser()
+
+        #Initialize variable for unpausing with play button
+        global pause
+        pause = "off"
+
+        #Initialize pygame mixer
+        pygame.mixer.init()
+        #Initial volume for player
+        pygame.mixer.music.set_volume(0.5)
 
     """
     def os_detection():
@@ -107,11 +132,29 @@ class Ui_MainWindow(object):
         return default_path
     """
 
+    #Build function to add selected songs to gui list
+    #Only show song name by using string.replace() while keeping data
+    #Using songs from list, allow song to play from list selection
+
+    #In Graphic box, load default image 
+    #Future addition --> allow/search for album art and display in grapic box
+
+    #Add new code for song list box
+
+    #Build similar function for loading playlists
+
+
     def browse_songs(self):
         #default_path = os_detection()
         default_path = "/home/"
-        global file_name
-        file_name = QFileDialog.getOpenFileName(None, "Select a song:", default_path, "Song Files (*.wav *.mp3)")
+        file_name = QFileDialog.getOpenFileName(None, "Select a song:", default_path, "Song Files (*.wav)")
+        global song_name
+        global user
+        song_name = file_name[0];
+        song_name = song_name.replace(f"/home/{user}/Downloads/", "")
+        song_name = song_name.replace(".wav", "")
+
+        self.listWidget.addItem(song_name)
         #use file_name to start playing song
         #future functionality --> add song to song list left and read file from list to play songs
 
@@ -120,19 +163,53 @@ class Ui_MainWindow(object):
         folder_name = QFileDialog.getExistingDirectory(None, "Select a playlist (folder):", default_path)
         #build method to show all folder files (playlist songs) in left column and show playlists (folders) in right column
         #allow selection of folders present in right column to load songs into left column
-
-    def init_music():
-        pygame.mixer.init()
-        pygame.mixer.music.load(file_name)
-
+        #allow user to provide playlist path or use application default path
     def play(self):
-        pygame.mixer.music.play()
+        global pause
+        global user
+        if pause == "off":
+            song = f'/home/{user}/Downloads/{song_name}.wav'
+
+            pygame.mixer.music.load(song)
+            pygame.mixer.music.play(loops=0)
+
+        if pause == "on":
+            pygame.mixer.music.unpause()
+            pause = "off"
+
+        
 
     def pause(self):
         pygame.mixer.music.pause()
 
+        #For unpausing using the play button
+        global pause
+        pause = "on"
+
     def stop(self):
         pygame.mixer.music.stop()
+        pygame.mixer.music.unload()
+        global pause 
+        global play
+        play = "off"
+        pause = "off"
+
+    def selection_change(self):
+        song_name = self.listWidget.selectedItems()
+        global pause 
+        pause = "off"
+
+    def adjust_volume(self):
+        #Volume values between 0 and 1.0
+        volume = self.horizontalSlider.value()
+        if volume == 0:
+            volume = 0
+
+        else:
+            volume = volume / 100
+        pygame.mixer.music.set_volume(volume)
 
 
-
+    #Build a class to write a config file to store user songs after application closes
+    #Build function in class to read and initialize data on startup
+    #If no config (initial startup) --> continue regular startup
