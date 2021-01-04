@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import QDir
 import pygame
 import getpass
+import generate_config
+import os_functions
+import check_config
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -113,40 +116,23 @@ class Ui_MainWindow(object):
         global pause
         pause = "off"
 
+        check_config.check(self)
+
         #Initialize pygame mixer
         pygame.mixer.init()
         #Initial volume for player
         pygame.mixer.music.set_volume(0.5)
 
-    """
-    def os_detection():
-        system_os = platform.system()
-        default_path = ""
-        
-        if system_os == "Linux" or sysetm_os == "Darwin" or system_os == "Java":
-            default_path = "/home/"
-
-        if system_os == "Windows":
-            default_path = "C:\\"
-
-        return default_path
-    """
-
-    #Build function to add selected songs to gui list
-    #Only show song name by using string.replace() while keeping data
-    #Using songs from list, allow song to play from list selection
-
     #In Graphic box, load default image 
     #Future addition --> allow/search for album art and display in grapic box
 
-    #Add new code for song list box
-
     #Build similar function for loading playlists
 
-
+    #Add minus button to remove song from list
+    #change 'Select a song' button to +
     def browse_songs(self):
         #default_path = os_detection()
-        default_path = "/home/"
+        default_path = os_functions.os_path_detection()
         file_name = QFileDialog.getOpenFileName(None, "Select a song:", default_path, "Song Files (*.wav)")
         global song_name
         global user
@@ -155,17 +141,24 @@ class Ui_MainWindow(object):
         song_name = song_name.replace(".wav", "")
 
         self.listWidget.addItem(song_name)
+
+        #Adds songs to list and writes to config file
+        generate_config.scan_list(self)
+
         #use file_name to start playing song
         #future functionality --> add song to song list left and read file from list to play songs
 
     def browse_playlist(self): #browse playlist -> playlist is a folder of songs created from this player
         default_path = "/home/"
         folder_name = QFileDialog.getExistingDirectory(None, "Select a playlist (folder):", default_path)
+        
         #build method to show all folder files (playlist songs) in left column and show playlists (folders) in right column
         #allow selection of folders present in right column to load songs into left column
         #allow user to provide playlist path or use application default path
+
     def play(self):
         global pause
+        global song_name
         global user
         if pause == "off":
             song = f'/home/{user}/Downloads/{song_name}.wav'
@@ -176,8 +169,6 @@ class Ui_MainWindow(object):
         if pause == "on":
             pygame.mixer.music.unpause()
             pause = "off"
-
-        
 
     def pause(self):
         pygame.mixer.music.pause()
@@ -195,7 +186,12 @@ class Ui_MainWindow(object):
         pause = "off"
 
     def selection_change(self):
-        song_name = self.listWidget.selectedItems()
+        global song_name
+        tmp_song_name = ([i.text() for i in self.listWidget.selectedItems()])
+        song_name = tmp_song_name[0]
+        song_name = song_name.replace("['", "")
+        song_name = song_name.replace("']", "")
+        
         global pause 
         pause = "off"
 
