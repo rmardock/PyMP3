@@ -137,6 +137,7 @@ class Ui_MainWindow(object):
         global song_name
         global user
         song_name = file_name[0];
+        print(song_name)
         song_name = song_name.replace(f"/home/{user}/Downloads/", "")
         song_name = song_name.replace(".wav", "")
 
@@ -159,9 +160,10 @@ class Ui_MainWindow(object):
     def play(self):
         global pause
         global song_name
-        global user
+        #global user
         if pause == "off":
-            song = f'/home/{user}/Downloads/{song_name}.wav'
+            song_path = os_functions.song_location()
+            song = f'{song_path}{song_name}.wav'
 
             pygame.mixer.music.load(song)
             pygame.mixer.music.play(loops=0)

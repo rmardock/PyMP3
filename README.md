@@ -5,6 +5,10 @@ This is currently a work in progress and is not yet finished.
 
 For now, this music player will only use .wav files because pygame does not support (or is rough) with .mp3 files.
 
-I haven't finished cross-platform support for directory file path formatting, so for now the file paths are only formatted to Linux/UNIX.
+Windows is now supported! 
 
-Right now the file path is set to /home/user/Downloads/ and '/user/' is your username.
+For now the file path for song files is set to /home/'user'/Downloads/ for linux/mac and C:\Users\'user'\Downloads\ for windows. 
+
+'user' in these paths is the current user's username. The application automatically detects and uses the username in file paths.
+
+For now please use the download folder for managing music. Future updates will allow more flexibility

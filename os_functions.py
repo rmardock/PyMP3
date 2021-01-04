@@ -1,5 +1,6 @@
 import os
 import sys
+import getpass
 
 #File path for config file
 def find_config_directory():
@@ -27,3 +28,32 @@ def os_path_detection():
 		slash = "/"
 
 	return default_path
+
+#Detects user OS
+def os_detection():
+	user_os = ""
+	if sys.platform.startswith("linux"):
+		user_os = "linux"
+
+	if sys.platform.startswith("darwin"):
+		user_os = "mac"
+
+	if sys.platform.startswith("win32"):
+		user_os = "windows"
+
+	return user_os
+
+#Default file path for music in downloads folder for now
+def song_location():
+	global user 
+	user = getpass.getuser()
+	user_os = os_detection()
+
+	song_path = ""
+	if user_os == "linux" or user_os == "mac":
+		song_path = f"/home/{user}/Downloads/"
+
+	if user_os == "windows":
+		song_path = f"C:\\Users\\{user}\\Downloads\\"
+
+	return song_path
