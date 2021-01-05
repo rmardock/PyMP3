@@ -12,25 +12,22 @@ def find_config_directory():
 #Detects user current os for file management
 def os_path_detection():
 	global slash
+	user_os = _os_detection()
 	slash = "/"
 	default_path = ""
 
-	if sys.platform.startswith("linux"):
+	if user_os == "linux" or user_os == "mac":
 		default_path = "/home/"
 		slash = "/"
 
-	if sys.platform.startswith("win32"):
+	if user_os == "windows":
 		default_path = "C:\\"
 		slash = "\\"
-
-	if sys.platform.startswith("darwin"):
-		default_path = "/home/"
-		slash = "/"
 
 	return default_path
 
 #Detects user OS
-def os_detection():
+def _os_detection():
 	user_os = ""
 	if sys.platform.startswith("linux"):
 		user_os = "linux"
@@ -47,7 +44,7 @@ def os_detection():
 def song_location():
 	global user 
 	user = getpass.getuser()
-	user_os = os_detection()
+	user_os = _os_detection()
 
 	song_path = ""
 	if user_os == "linux" or user_os == "mac":
