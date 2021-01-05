@@ -5,7 +5,7 @@ import pygame
 import getpass
 import config_module
 import os_functions
-import check_config
+
 #Rename all QWidget elements
 class Ui_MainWindow(object):
 
