@@ -19,8 +19,7 @@ def _update_config(song_list):
 
 	#Writes each song to new line in config file
 	for i in range(0, len(song_list)):
-		print(song_list[i])
 		tmp_str = str(song_list[i])
-		config.write(f"{tmp_str}")
+		config.write(f"{tmp_str}\n")
 
 	config.close()
