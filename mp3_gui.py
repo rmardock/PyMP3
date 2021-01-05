@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QFileDialog
 from PyQt5.QtCore import QDir
 import pygame
 import getpass
-import generate_config
+import config_module
 import os_functions
 import check_config
 #Rename all QWidget elements
@@ -126,7 +126,9 @@ class Ui_MainWindow(object):
     def initUI(self, MainWindow):
         #File browsing button connections
         self.pushButton_6.clicked.connect(self._browse_songs)
-        self.pushButton_5.clicked.connect(self._browse_playlist)#add ability to create playlists and add to them
+        #self.pushButton_5.clicked.connect(self._browse_playlist) 
+
+        #add ability to create playlists and add to them
 
         #Media control button connections
         self.pushButton.clicked.connect(self._play)
@@ -143,8 +145,12 @@ class Ui_MainWindow(object):
         global pause
         pause = "off"
 
+        #Initialize file system slash/backslash
+        global slash 
+        slash = os_functions.slash_init()
+
         #Check for config file and initialize data if config file exists
-        check_config.check(self)
+        config_module.check(self)
 
         #Initialize pygame mixer
         pygame.mixer.init()
@@ -172,15 +178,7 @@ class Ui_MainWindow(object):
         self.listWidget.addItem(song_name)
 
         #Adds songs to list and writes to config file
-        generate_config.scan_list(self)
-
-    def _browse_playlist(self): #browse playlist -> playlist is a folder of songs created from this player
-        default_path = "/home/"
-        folder_name = QFileDialog.getExistingDirectory(None, "Select a playlist (folder):", default_path)
-        
-        #build method to show all folder files (playlist songs) in left column and show playlists (folders) in right column
-        #allow selection of folders present in right column to load songs into left column
-        #allow user to provide playlist path or use application default path
+        config_module.scan_list(self)
 
     def _play(self):
         global pause
@@ -238,7 +236,6 @@ class Ui_MainWindow(object):
         pygame.mixer.music.set_volume(volume)
 
     def _add_playlist(self):
-        #Code to make folder and copy file paths in for reading into song list
         #Instead of folder --> possibly make a playlist.txt file and read songs in from there
         return
 

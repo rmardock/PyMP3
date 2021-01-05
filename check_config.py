@@ -8,7 +8,7 @@ from PyQt5.QtCore import QDir
 #Checks if config file is present
 #If config is present, load data
 def check(self):
-	os_functions.os_path_detection()
+	#os_functions.os_path_detection()
 	config_path = os_functions.find_config_directory()
 
 	#If config file exists
