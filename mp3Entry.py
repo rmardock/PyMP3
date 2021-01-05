@@ -8,6 +8,8 @@ if __name__ == "__main__":
 		app = QtWidgets.QApplication(sys.argv)
 
 MainWindow = QtWidgets.QMainWindow()
+
+#Set GUI color scheme
 app.setStyle('Fusion')
 palette = QtGui.QPalette()
 palette.setColor(QtGui.QPalette.Window, QtGui.QColor(53,53,53))
@@ -19,11 +21,12 @@ palette.setColor(QtGui.QPalette.ToolTipText, QtCore.Qt.white)
 palette.setColor(QtGui.QPalette.Text, QtCore.Qt.white)
 palette.setColor(QtGui.QPalette.Button, QtGui.QColor(53,53,53))
 palette.setColor(QtGui.QPalette.ButtonText, QtCore.Qt.white)
-palette.setColor(QtGui.QPalette.BrightText, QtCore.Qt.red)
-         
+palette.setColor(QtGui.QPalette.BrightText, QtCore.Qt.red)        
 palette.setColor(QtGui.QPalette.Highlight, QtGui.QColor(142,45,197).lighter())
 palette.setColor(QtGui.QPalette.HighlightedText, QtCore.Qt.black)
 app.setPalette(palette)
+
+#Initialize GUI and run
 ui = Ui_MainWindow()
 ui.setupUi(MainWindow)
 ui.initUI(MainWindow)

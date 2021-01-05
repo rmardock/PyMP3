@@ -8,6 +8,8 @@ import os_functions
 import check_config
 
 class Ui_MainWindow(object):
+    
+    #Initialize UI elements
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
@@ -116,6 +118,7 @@ class Ui_MainWindow(object):
         global pause
         pause = "off"
 
+        #Check for config file and initialize data if config file exists
         check_config.check(self)
 
         #Initialize pygame mixer
@@ -131,23 +134,22 @@ class Ui_MainWindow(object):
     #Add minus button to remove song from list
     #change 'Select a song' button to +
     def browse_songs(self):
-        #default_path = os_detection()
         default_path = os_functions.os_path_detection()
         file_name = QFileDialog.getOpenFileName(None, "Select a song:", default_path, "Song Files (*.wav)")
+        
         global song_name
         global user
+        
+        song_path = os_functions.song_location()
         song_name = file_name[0];
-        print(song_name)
-        song_name = song_name.replace(f"/home/{user}/Downloads/", "")
+        song_name = song_name.replace(f"{song_path}", "")
         song_name = song_name.replace(".wav", "")
 
+        #Update listWidget column
         self.listWidget.addItem(song_name)
 
         #Adds songs to list and writes to config file
         generate_config.scan_list(self)
-
-        #use file_name to start playing song
-        #future functionality --> add song to song list left and read file from list to play songs
 
     def browse_playlist(self): #browse playlist -> playlist is a folder of songs created from this player
         default_path = "/home/"
@@ -160,14 +162,15 @@ class Ui_MainWindow(object):
     def play(self):
         global pause
         global song_name
-        #global user
         if pause == "off":
             song_path = os_functions.song_location()
             song = f'{song_path}{song_name}.wav'
 
+            #Load song and play 
             pygame.mixer.music.load(song)
             pygame.mixer.music.play(loops=0)
 
+        #If unpausing, resume
         if pause == "on":
             pygame.mixer.music.unpause()
             pause = "off"
@@ -187,6 +190,7 @@ class Ui_MainWindow(object):
         play = "off"
         pause = "off"
 
+    #Function for when new song is selected in listWidget
     def selection_change(self):
         global song_name
         tmp_song_name = ([i.text() for i in self.listWidget.selectedItems()])
@@ -206,8 +210,3 @@ class Ui_MainWindow(object):
         else:
             volume = volume / 100
         pygame.mixer.music.set_volume(volume)
-
-
-    #Build a class to write a config file to store user songs after application closes
-    #Build function in class to read and initialize data on startup
-    #If no config (initial startup) --> continue regular startup
